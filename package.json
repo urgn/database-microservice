@@ -1,0 +1,22 @@
+{
+  "name": "database-microservice",
+  "version": "0.0.1",
+  "description": "Blog engine database microservice",
+  "scripts": {
+    "build": "tsc",
+    "start": "npm run build && node dist/run.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/urgn/database-microservice.git"
+  },
+  "author": "urgn",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/urgn/backend-microservice/issues"
+  },
+  "homepage": "https://github.com/urgn/backend-microservice#readme",
+  "devDependencies": {
+    "typescript": "^4.6.2"
+  }
+}
