@@ -1,0 +1,7 @@
+services:
+    mongodb:
+        image: mongo:4.2
+        ports:
+            - "27017:27017"
+        environment:
+            - LICENSE=accept

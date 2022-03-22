@@ -1,7 +1,7 @@
 import { injectable, multiInject, inject } from "inversify";
 import express, { Express, Router } from "express";
 import { Server } from "http";
-import { promisify } from "util";
+import * as bodyParser from "body-parser";
 
 export interface AppRouter {
     path: string;
@@ -18,9 +18,10 @@ export class HttpServer {
         @multiInject("ROUTER") private routes: AppRouter[]
     ) {
         this.expressApp = express();
-        this.routes.forEach(route => {
-            this.expressApp.use(route.expressRouter, route.expressRouter);
-        })
+        this.expressApp.use(bodyParser.json());
+        this.routes.forEach(router => {
+            this.expressApp.use(router.path, router.expressRouter);
+        });
     }
 
     async start() {

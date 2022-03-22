@@ -13,7 +13,7 @@ export class HealthRouter implements AppRouter {
     }
 
     get path() {
-        return "health";
+        return "/health";
     }
 
     get expressRouter() {

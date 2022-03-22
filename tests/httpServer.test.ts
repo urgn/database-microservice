@@ -3,22 +3,23 @@ import { container } from "../src/container";
 import { HttpServer } from "../src/shared/httpServer";
 import axios from "axios";
 import { settings } from "../src/settings";
+import { Service } from "../src/service";
 
 describe("Mock test", () => {
 
-    let server: HttpServer;
+    let service: Service;
 
     before(async () => {
-        server = container.get(HttpServer);
-        await server.start();
+        service = container.get(Service);
+        await service.start();
     });
 
     after(async () => {
-        await server.stop();
+        await service.stop();
     });
 
     it("shoul make health check", async () => {
-        const response = await axios.get(`http://localhost:${settings.HTTP_PORT}`);
+        const response = await axios.get(`http://localhost:${settings.HTTP_PORT}/health`);
 
         expect(response.data).to.deep.eq({
             status: "ok"

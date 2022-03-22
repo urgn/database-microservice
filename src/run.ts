@@ -1,9 +1,9 @@
 import { container } from "./container";
-import { HttpServer } from "./shared/httpServer";
+import { Service } from "./service";
 
-const server = container.get(HttpServer);
+const service = container.get(Service);
 
-server.start().then(() => {
+service.start().then(() => {
     console.log("Application has started")
 }).catch(error => {
     console.error(error);
