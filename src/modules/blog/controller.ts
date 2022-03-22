@@ -1,20 +1,12 @@
 import { injectable } from "inversify";
-import { Blog, Post } from "../../models";
+import { BlogCollection } from "./blogCollection";
 import {
+    Blog,
     BlogWithId,
-    BlogCollection,
     BlogId,
     BlogFilter
-} from "./blogCollection";
-
-export type BlogResponse = BlogWithId & {
-    posts: []
-}
-
-export interface ReadBlogFilter {
-    id: BlogId;
-    slug: string;
-}
+} from "./blogInterfaces";
+import { BlogErrors } from "./errors";
 
 @injectable()
 export class BlogController {
@@ -24,33 +16,30 @@ export class BlogController {
     ) {
     }
 
-    async createBlog(spec: Blog): Promise<BlogResponse> {
-        const blog = await this.blogCollection.create(spec);
-        return this.mapToBlogResponse(blog, []);
+    async createBlog(spec: Blog): Promise<BlogWithId> {
+        return await this.blogCollection.create(spec);
     }
 
-    async readBlogs(filter: BlogFilter) {
-        const blogs = await this.blogCollection.read(filter);
-
-        return blogs.map(blog => this.mapToBlogResponse(blog, []));
-    }
-
-    updateBlog(blogId: BlogId, data: Partial<Blog>) {
-        
-    }
-
-    deleteBlog(blogId: BlogId) {
+    async readBlogs(filter: BlogFilter): Promise<BlogWithId[]> {
+        return await this.blogCollection.read(filter);
 
     }
 
-    mapToBlogResponse(blog: BlogWithId, posts: Post[]): BlogResponse {
-        const { id, name, slug } = blog;
+    async getBlogBySlug(slug: string): Promise<BlogWithId> {
+        const blogs = await this.blogCollection.read({ slug });
 
-        return {
-            id,
-            name,
-            slug,
-            posts: []
-        };
+        if (blogs.length !== 1) {
+            throw new Error(BlogErrors.NOT_FOUND);
+        }
+
+        return blogs[0];
+    }
+
+    async updateBlog(blogId: BlogId, data: Blog): Promise<BlogWithId>  {
+        return await this.blogCollection.update(blogId, data);
+    }
+
+    async deleteBlog(blogId: BlogId): Promise<void>  {
+        await this.blogCollection.delete(blogId);
     }
 }

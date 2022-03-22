@@ -4,8 +4,6 @@ import { container } from "../src/container";
 import { Service } from "../src/service";
 import { settings } from "../src/settings";
 import { Mongodb } from "../src/shared/mongodb";
-import { omit } from "ramda";
-import { ObjectId } from "mongodb";
 
 describe("Mock test", () => {
 
@@ -119,7 +117,7 @@ describe("Mock test", () => {
         }
     });
 
-    it.skip("should update blog", async () => {
+    it("should update blog", async () => {
         const testSlug = "init";
 
         const response = await axios.put(
@@ -131,20 +129,20 @@ describe("Mock test", () => {
         );
 
         expect(response.data).to.deep.eq({
-            id: dbIds[0]._id.toString(),
+            id: dbIds[0].toString(),
             name: "Original Blog",
             slug: "orig",
             posts: []
         });
 
-        const dbData = await mongodb.getCollection("blog").findOne({
+        const dbCount = await mongodb.getCollection("blog").count({
             slug: "orig"
         });
-        
-        expect(dbData.length).to.eq(1);
+
+        expect(dbCount).to.eq(1);
 
         expect(response.data).to.deep.eq({
-            id: dbIds[0]._id.toString(),
+            id: dbIds[0].toString(),
             name: "Original Blog",
             slug: "orig",
             posts: []
@@ -152,7 +150,7 @@ describe("Mock test", () => {
 
     });
 
-    it.skip("should delete blog", async () => {
+    it("should delete blog", async () => {
         const testSlug = "init";
 
         await axios.delete(
