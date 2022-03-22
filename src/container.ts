@@ -2,13 +2,16 @@ import "reflect-metadata";
 
 import { Container } from "inversify";
 
-import { HttpServer } from "./shared/httpServer";
-import { HealthRouter } from "./shared/heathRouter";
 import { settings } from "./settings";
 
-import { attachBlogModule } from "./modules/blog/module";
+import { HttpServer } from "./shared/httpServer";
+import { HealthRouter } from "./shared/heathRouter";
+
 import { Mongodb } from "./shared/mongodb";
 import { Service } from "./service";
+
+import { attachPostModule } from "./modules/post/module";
+import { attachBlogModule } from "./modules/blog/module";
 
 export const container = new Container();
 
@@ -24,3 +27,4 @@ container.bind(Mongodb).toSelf().inSingletonScope();
 container.bind(Service).toSelf();
 
 attachBlogModule(container);
+attachPostModule(container);

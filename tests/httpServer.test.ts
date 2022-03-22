@@ -4,7 +4,7 @@ import axios from "axios";
 import { settings } from "../src/settings";
 import { Service } from "../src/service";
 
-describe("Mock test", () => {
+describe("HttpServer test", () => {
 
     let service: Service;
 

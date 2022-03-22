@@ -5,7 +5,7 @@ import { Service } from "../src/service";
 import { settings } from "../src/settings";
 import { Mongodb } from "../src/shared/mongodb";
 
-describe("Mock test", () => {
+describe("Blog test", () => {
 
     let service: Service;
     let mongodb: Mongodb;
