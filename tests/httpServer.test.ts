@@ -1,6 +1,5 @@
 import { expect } from "chai";
 import { container } from "../src/container";
-import { HttpServer } from "../src/shared/httpServer";
 import axios from "axios";
 import { settings } from "../src/settings";
 import { Service } from "../src/service";

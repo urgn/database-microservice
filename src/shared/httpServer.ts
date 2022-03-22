@@ -22,6 +22,13 @@ export class HttpServer {
         this.routes.forEach(router => {
             this.expressApp.use(router.path, router.expressRouter);
         });
+        this.expressApp.use((err, req, res, next) => {
+            if (res.headersSent) {
+                return next(err)
+            }
+            res.status(500)
+            res.render('error', { error: err })
+        });
     }
 
     async start() {

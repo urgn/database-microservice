@@ -1,8 +1,9 @@
-import { injectable } from "inversify";
+import { injectable, inject } from "inversify";
 
 import { Collection, ObjectId } from "mongodb";
 import { Blog } from "../../models";
 import { Mongodb } from "../../shared/mongodb";
+import { BlogErrors } from "./errors";
 
 export type BlogId = string;
 export type BlogWithId = Blog & { id: BlogId };
@@ -38,5 +39,11 @@ export class BlogCollection {
             name,
             slug
         }));
+    }
+
+    public async update(filter: BlogFilter, ) {
+        if (!filter || (!filter.id && !filter.slug)) {
+            throw new Error(BlogErrors.UPDATE_MISSING_PARAMETERS);
+        }
     }
 }

@@ -1,15 +1,20 @@
 import { injectable } from "inversify";
-import { Blog } from "../../models";
+import { Blog, Post } from "../../models";
 import {
     BlogWithId,
     BlogCollection,
-    BlogId
+    BlogId,
+    BlogFilter
 } from "./blogCollection";
 
 export type BlogResponse = BlogWithId & {
     posts: []
 }
 
+export interface ReadBlogFilter {
+    id: BlogId;
+    slug: string;
+}
 
 @injectable()
 export class BlogController {
@@ -20,7 +25,26 @@ export class BlogController {
     }
 
     async createBlog(spec: Blog): Promise<BlogResponse> {
-        const { id, name, slug } = await this.blogCollection.create(spec);
+        const blog = await this.blogCollection.create(spec);
+        return this.mapToBlogResponse(blog, []);
+    }
+
+    async readBlogs(filter: BlogFilter) {
+        const blogs = await this.blogCollection.read(filter);
+
+        return blogs.map(blog => this.mapToBlogResponse(blog, []));
+    }
+
+    updateBlog(blogId: BlogId, data: Partial<Blog>) {
+        
+    }
+
+    deleteBlog(blogId: BlogId) {
+
+    }
+
+    mapToBlogResponse(blog: BlogWithId, posts: Post[]): BlogResponse {
+        const { id, name, slug } = blog;
 
         return {
             id,
@@ -28,17 +52,5 @@ export class BlogController {
             slug,
             posts: []
         };
-    }
-
-    // readBlog(filter: ReadBlogFilter) {
-
-    // }
-
-    updateBlog(blogId: BlogId, data: Partial<Blog>) {
-
-    }
-
-    deleteBlog(blogId: BlogId) {
-
     }
 }

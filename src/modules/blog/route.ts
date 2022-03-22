@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { injectable } from "inversify";
 import { AppRouter } from "../../shared/httpServer";
+import { BlogFilter } from "./blogCollection";
 import { BlogController } from "./controller";
 
 @injectable()
@@ -14,7 +15,8 @@ export class BlogRouter implements AppRouter {
         this.router = Router();
 
         this.router.post("/", this.handlePost.bind(this));
-        this.router.get("/", this.handleGet.bind(this));
+        this.router.get("/", this.handleGetAll.bind(this));
+        this.router.get("/:slug", this.handleGetOne.bind(this));
     }
 
     get path() {
@@ -26,12 +28,39 @@ export class BlogRouter implements AppRouter {
     }
 
     async handlePost(req: Request, res: Response) {
-        res.send(await this.blogController.createBlog(req.body));
+        const { posts, ...blog } = req.body;
+        res.send(await this.blogController.createBlog(blog));
     }
 
-    async handleGet(req: Request, res: Response) {
-        res.send({
-            foo: "bar"
+    async handleGetAll(req: Request, res: Response) {
+        const filter: BlogFilter = {};
+
+        if (req.query.id) {
+            filter.id = `${req.query.id}`;
+        }
+
+        if (req.query.slug) {
+            filter.id = `${req.query.id}`;
+        }
+
+        if (req.query.name) {
+            filter.name = `${req.query.name}`;
+        }
+
+        res.send(await this.blogController.readBlogs(filter));
+    }
+
+    async handleGetOne(req: Request, res: Response) {
+
+        const blogs = await this.blogController.readBlogs({
+            slug: req.params.slug
         });
+
+        if (!blogs?.length) {
+            res.status(404);
+            return res.send();
+        }
+
+        res.send(blogs[0]);
     }
 }
