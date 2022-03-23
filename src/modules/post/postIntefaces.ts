@@ -15,4 +15,4 @@ export type PostAppInternal = PostRelatedToBlog & PostWithId;
 
 export type PostResponse = PostWithId;
 
-export type PostFilter = Partial<PostAppInternal>;
+export type PostFilter = Partial<PostAppInternal & { blogIds: BlogId[] }>;

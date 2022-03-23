@@ -161,4 +161,66 @@ describe("Blog With Post test", () => {
 			posts: []
 		});
 	});
+
+	it("should read all blogs with posts", async () => {
+		const response = await axios.get(
+			`http://localhost:${settings.HTTP_PORT}/blog?showPosts`
+		);
+
+		expect(response.data).to.deep.eq(
+			[
+				{
+					name: "Testing Blog",
+					slug: "dummy",
+					posts: [
+						{
+							id: mockPostIds[0].toString(),
+							title: "Welcome post",
+							content: "Lorem ipsum",
+							viewCount: 123
+						},
+						{
+							id: mockPostIds[1].toString(),
+							title: "Another Post",
+							content: "Foo Bar",
+							viewCount: 456
+						},
+					]
+				},
+				{
+					name: "Second Blog",
+					slug: "2nd",
+					posts: [
+						{
+							id: mockPostIds[2].toString(),
+							title: "Post of different blog",
+							content: "Just in case",
+							viewCount: -1
+						}
+					]
+				}
+			]
+		);
+	});
+
+	it("should read blog without posts", async () => {
+		const response = await axios.get(
+			`http://localhost:${settings.HTTP_PORT}/blog`
+		);
+
+		expect(response.data).to.deep.eq(
+			[
+				{
+					name: "Testing Blog",
+					slug: "dummy",
+					posts: []
+				},
+				{
+					name: "Second Blog",
+					slug: "2nd",
+					posts: []
+				}
+			]
+		);
+	});
 });

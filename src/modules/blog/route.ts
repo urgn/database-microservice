@@ -51,7 +51,6 @@ export class BlogRouter implements AppRouter {
                 return next(new BadRequest(error.message));
             }
 			console.error(error);
-			console.error(error);
 			return next(error);
 		}
 

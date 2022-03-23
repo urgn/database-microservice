@@ -7,7 +7,7 @@ import { PostAppInternal, PostFilter, PostId, PostRelatedToBlog } from "./postIn
 @injectable()
 export class PostCollection {
 	constructor(
-        private mongodb: Mongodb
+		private mongodb: Mongodb
 	) { }
 
 	public collection() {
@@ -42,10 +42,14 @@ export class PostCollection {
 	}
 
 	private mapFilterToMongoFilter(filter: PostFilter): Filter<WithId<PostRelatedToBlog>> {
-		const mongoFilter: Filter<WithId<PostRelatedToBlog>> = omit(["id"], filter);
+		const mongoFilter: Filter<WithId<PostRelatedToBlog>> = omit(["id", "blogIds"], filter);
 
 		if (filter.id) {
 			mongoFilter._id = new ObjectId(filter.id);
+		}
+
+		if (filter?.blogIds?.length) {
+			mongoFilter.blogId = { $in: filter.blogIds };
 		}
 
 		return mongoFilter;
@@ -57,8 +61,8 @@ export class PostCollection {
 			{
 				_id: mongdoId
 			}, {
-				$set: contents
-			});
+			$set: contents
+		});
 
 		const updatedBlog = await this.collection().findOne({ _id: mongdoId });
 

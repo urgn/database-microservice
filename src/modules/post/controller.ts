@@ -6,7 +6,7 @@ import { Post, PostAppInternal, PostId } from "./postIntefaces";
 @injectable()
 export class PostController {
 	constructor(
-        private postCollection: PostCollection
+		private postCollection: PostCollection
 	) {
 
 	}
@@ -42,7 +42,7 @@ export class PostController {
 	async getPostsByBlogIds(
 		blogIds: BlogId[]
 	): Promise<PostAppInternal[]> {
-		throw new Error("Not implemented yet!");
+		return await this.postCollection.read({ blogIds });
 	}
 
 	async getOnePost(
