@@ -29,7 +29,7 @@ export class BlogRouter implements AppRouter {
 	}
 
 	get path() {
-		return "/blog";
+		return "/blogs";
 	}
 
 	get expressRouter() {

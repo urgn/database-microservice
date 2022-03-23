@@ -79,7 +79,7 @@ describe("Blog With Post test", () => {
 
 	it("should create blog with posts ", async () => {
 		const response = await axios.post(
-			`http://localhost:${settings.HTTP_PORT}/blog`,
+			`http://localhost:${settings.HTTP_PORT}/blogs`,
 			{
 				name: "Blog with posts",
 				slug: "bwp",
@@ -127,7 +127,7 @@ describe("Blog With Post test", () => {
 
 	it("should read blog with posts", async () => {
 		const response = await axios.get(
-			`http://localhost:${settings.HTTP_PORT}/blog/${blogSlug}?showPosts`
+			`http://localhost:${settings.HTTP_PORT}/blogs/${blogSlug}?showPosts`
 		);
 
 		expect(response.data).to.deep.eq({
@@ -152,7 +152,7 @@ describe("Blog With Post test", () => {
 
 	it("should read blog without posts", async () => {
 		const response = await axios.get(
-			`http://localhost:${settings.HTTP_PORT}/blog/${blogSlug}`
+			`http://localhost:${settings.HTTP_PORT}/blogs/${blogSlug}`
 		);
 
 		expect(response.data).to.deep.eq({
@@ -162,10 +162,12 @@ describe("Blog With Post test", () => {
 		});
 	});
 
-	it("should read all blogs with posts", async () => {
+	it.only("should read all blogs with posts", async () => {
 		const response = await axios.get(
-			`http://localhost:${settings.HTTP_PORT}/blog?showPosts`
+			`http://localhost:${settings.HTTP_PORT}/blogs?showPosts`
 		);
+
+		console.log(JSON.stringify(response.data))
 
 		expect(response.data).to.deep.eq(
 			[
@@ -205,7 +207,7 @@ describe("Blog With Post test", () => {
 
 	it("should read blog without posts", async () => {
 		const response = await axios.get(
-			`http://localhost:${settings.HTTP_PORT}/blog`
+			`http://localhost:${settings.HTTP_PORT}/blogs`
 		);
 
 		expect(response.data).to.deep.eq(

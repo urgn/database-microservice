@@ -78,7 +78,7 @@ describe("Post test", () => {
 
 	it("should create post", async () => {
 		const response = await axios.post(
-			`http://localhost:${settings.HTTP_PORT}/blog/${blogSlug}`,
+			`http://localhost:${settings.HTTP_PORT}/blogs/${blogSlug}/posts`,
 			{
 				title: "New post for testing",
 				content: "Hello world!",
@@ -100,7 +100,7 @@ describe("Post test", () => {
 
 	it("should read post by id", async () => {
 		const response = await axios.get(
-			`http://localhost:${settings.HTTP_PORT}/blog/${blogSlug}/${mockPostIds[1]}`
+			`http://localhost:${settings.HTTP_PORT}/blogs/${blogSlug}/posts/${mockPostIds[1]}`
 		);
 
 		expect(response.data).to.deep.eq({
@@ -114,7 +114,7 @@ describe("Post test", () => {
 	it("should fail reading post from abother slug", async () => {
 		try {
 			await axios.get(
-				`http://localhost:${settings.HTTP_PORT}/blog/${blogSlug}/${mockPostIds[2].toString()}`
+				`http://localhost:${settings.HTTP_PORT}/blogs/${blogSlug}/posts/${mockPostIds[2].toString()}`
 			);
 			expect.fail();
 		} catch (error) {
@@ -124,7 +124,7 @@ describe("Post test", () => {
 
 	it("should update post", async () => {
 		const response = await axios.put(
-			`http://localhost:${settings.HTTP_PORT}/blog/${blogSlug}/${mockPostIds[0].toString()}`,
+			`http://localhost:${settings.HTTP_PORT}/blogs/${blogSlug}/posts/${mockPostIds[0].toString()}`,
 			{
 				title: "Updated Post",
 				content: "Updated content",
@@ -155,7 +155,7 @@ describe("Post test", () => {
 
 	it("should delete post", async () => {
 		await axios.delete(
-			`http://localhost:${settings.HTTP_PORT}/blog/${blogSlug}/${mockPostIds[0].toString()}`
+			`http://localhost:${settings.HTTP_PORT}/blogs/${blogSlug}/posts/${mockPostIds[0].toString()}`
 		);
 
 		const dbCount = await mongodb.getCollection("post").count({ _id: mockPostIds[0] });

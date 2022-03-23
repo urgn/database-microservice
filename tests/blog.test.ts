@@ -42,7 +42,7 @@ describe("Blog test", () => {
 
 	it("should create blog", async () => {
 		const response = await axios.post(
-			`http://localhost:${settings.HTTP_PORT}/blog`,
+			`http://localhost:${settings.HTTP_PORT}/blogs`,
 			{
 				name: "TestBlog",
 				slug: "tst",
@@ -65,7 +65,7 @@ describe("Blog test", () => {
 	it("should fail creation with the same slug", async () => {
 		try {
 			await axios.post(
-				`http://localhost:${settings.HTTP_PORT}/blog`,
+				`http://localhost:${settings.HTTP_PORT}/blogs`,
 				{
 					name: "Another 2nd blog",
 					slug: "2nd",
@@ -79,7 +79,7 @@ describe("Blog test", () => {
 	});
 
 	it("should read blogs", async () => {
-		const response = await axios.get(`http://localhost:${settings.HTTP_PORT}/blog`);
+		const response = await axios.get(`http://localhost:${settings.HTTP_PORT}/blogs`);
 
 		const dbData = await mongodb.getCollection("blog").find({}).toArray();
 
@@ -101,7 +101,7 @@ describe("Blog test", () => {
 
 	it("should read blog by slug", async () => {
 		const testSlug = "2nd";
-		const response = await axios.get(`http://localhost:${settings.HTTP_PORT}/blog/${testSlug}`);
+		const response = await axios.get(`http://localhost:${settings.HTTP_PORT}/blogs/${testSlug}`);
 
 		expect(response.data).to.deep.eq(
 			{
@@ -116,7 +116,7 @@ describe("Blog test", () => {
 		const testSlug = "na";
 
 		try {
-			await axios.get(`http://localhost:${settings.HTTP_PORT}/blog/${testSlug}`);
+			await axios.get(`http://localhost:${settings.HTTP_PORT}/blogs/${testSlug}`);
 			expect.fail();
 		} catch (e) {
 			expect(e.toString()).to.match(/404/);
@@ -127,7 +127,7 @@ describe("Blog test", () => {
 		const testSlug = "init";
 
 		const response = await axios.put(
-			`http://localhost:${settings.HTTP_PORT}/blog/${testSlug}`,
+			`http://localhost:${settings.HTTP_PORT}/blogs/${testSlug}`,
 			{
 				name: "Original Blog",
 				slug: "orig"
@@ -158,7 +158,7 @@ describe("Blog test", () => {
 		const testSlug = "init";
 
 		await axios.delete(
-			`http://localhost:${settings.HTTP_PORT}/blog/${testSlug}`,
+			`http://localhost:${settings.HTTP_PORT}/blogs/${testSlug}`,
 		);
 
 		const dbData = await mongodb.getCollection("blog").find({}).toArray();

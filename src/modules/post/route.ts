@@ -26,7 +26,7 @@ export class PostRouter implements AppRouter {
 	}
 
 	get path() {
-		return "/blog/:slug";
+		return "/blogs/:slug/posts";
 	}
 
 	get expressRouter() {
