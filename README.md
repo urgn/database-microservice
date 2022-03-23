@@ -38,6 +38,7 @@ Example response:
     }
 ]
 ```
+---
 
 To read all blogs `http GET` with child posts:
 
@@ -77,6 +78,7 @@ Example response:
     }
 ]
 ```
+---
 To create blog `http POST` to:
 ```
 /blogs
@@ -100,6 +102,7 @@ With JSON encoded body:
     ]
 }
 ```
+---
 To update blog `http PUT`:
 ```
 /blogs/:slug
@@ -111,7 +114,8 @@ With JSON encoded body:
     "slug": "updated_slug",
 }
 ```
-To delete blog `http DELETE`
+---
+To delete blog `http DELETE`:
 ```
 /blogs/:slug
 ```
@@ -138,6 +142,7 @@ Example response:
 ]
 
 ```
+---
 To view single post `http GET`:
 
 ```
@@ -152,6 +157,7 @@ Example response:
     "content": "Foo Bar"
 }
 ```
+---
 
 To create post related to a blog `http POST`:
 ```
@@ -161,11 +167,11 @@ With JSON encoded body:
 ```JSON
 {
     "title": "New post",
-	"content": "Hello world!",
-	"viewCount": 0
+    "content": "Hello world!",
+    "viewCount": 0
 }
 ```
-
+---
 To update post related to a blog `http PUT`:
 ```
 /blogs/:slug/posts/:postId
@@ -174,11 +180,12 @@ With JSON encoded body:
 ```JSON
 {
     "title": "Updated post",
-	"content": "Brand new content",
-	"viewCount": 123
+    "content": "Brand new content",
+    "viewCount": 123
 }
 ```
-To delete post `http DELETE`
+---
+To delete post `http DELETE`:
 ```
 /blogs/:slug/posts/:postId
 ```
