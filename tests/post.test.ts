@@ -98,6 +98,28 @@ describe("Post test", () => {
 		});
 	});
 
+
+	it("should read all posts", async () => {
+		const response = await axios.get(
+			`http://localhost:${settings.HTTP_PORT}/blogs/${blogSlug}/posts`
+		);
+
+		expect(response.data).to.deep.eq([
+			{
+				id: mockPostIds[0].toString(),
+				title: "Welcome post",
+				content: "Lorem ipsum",
+				viewCount: 123
+			},
+			{
+				id: mockPostIds[1].toString(),
+				title: "Another Post",
+				content: "Foo Bar",
+				viewCount: 456
+			}
+		]);
+	});
+
 	it("should read post by id", async () => {
 		const response = await axios.get(
 			`http://localhost:${settings.HTTP_PORT}/blogs/${blogSlug}/posts/${mockPostIds[1]}`
@@ -111,7 +133,7 @@ describe("Post test", () => {
 		});
 	});
 
-	it("should fail reading post from abother slug", async () => {
+	it("should fail reading post from another slug", async () => {
 		try {
 			await axios.get(
 				`http://localhost:${settings.HTTP_PORT}/blogs/${blogSlug}/posts/${mockPostIds[2].toString()}`

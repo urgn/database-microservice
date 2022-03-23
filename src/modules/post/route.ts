@@ -20,6 +20,7 @@ export class PostRouter implements AppRouter {
 		this.router = Router({ mergeParams: true });
 
 		this.router.post("/", this.handlePost.bind(this));
+		this.router.get("/", this.handleGetAll.bind(this));
 		this.router.get("/:postId", this.handleGetOne.bind(this));
 		this.router.put("/:postId", this.handleUpdate.bind(this));
 		this.router.delete("/:postId", this.handleDelete.bind(this));
@@ -50,6 +51,18 @@ export class PostRouter implements AppRouter {
 		try {
 			const post = await this.fetchPostRelatedToBlog(req);
 			return res.send(PostMapper.mapPostAppInternalToPostResponse(post));
+		} catch (error) {
+			return next(error);
+		}
+	}
+
+	async handleGetAll(req: Request, res: Response, next: NextFunction) {
+		try {
+			const blog = await this.fetchBlogBySlug(req);
+			const posts = await this.postController.getPostsByBlogId(blog.id);
+			return res.send(
+				posts.map(post => PostMapper.mapPostAppInternalToPostResponse(post))
+			);
 		} catch (error) {
 			return next(error);
 		}

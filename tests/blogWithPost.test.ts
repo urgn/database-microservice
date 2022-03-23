@@ -162,12 +162,11 @@ describe("Blog With Post test", () => {
 		});
 	});
 
-	it.only("should read all blogs with posts", async () => {
+	it("should read all blogs with posts", async () => {
 		const response = await axios.get(
 			`http://localhost:${settings.HTTP_PORT}/blogs?showPosts`
 		);
 
-		console.log(JSON.stringify(response.data))
 
 		expect(response.data).to.deep.eq(
 			[
