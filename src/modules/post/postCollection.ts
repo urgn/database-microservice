@@ -23,6 +23,16 @@ export class PostCollection {
         }
     }
 
+    public async createMany(spec: PostRelatedToBlog[]): Promise<PostAppInternal[]> {
+        const { insertedIds } = await this.collection().insertMany(spec);
+
+        const insertedPosts = await this.collection().find({
+            _id: { $in: Object.values(insertedIds) }
+        }).toArray();
+
+        return insertedPosts.map(post => this.mapMongoPostToApp(post));
+    }
+
     public async read(filter: PostFilter): Promise<PostAppInternal[]> {
         const mongoFilter = this.mapFilterToMongoFilter(filter);
 

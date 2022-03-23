@@ -41,6 +41,7 @@ describe("Blog test", () => {
 
     afterEach(async () => {
         await mongodb.getCollection("blog").deleteMany({});
+        await mongodb.getCollection("post").deleteMany({});
     });
 
     it("should create blog", async () => {
@@ -49,11 +50,7 @@ describe("Blog test", () => {
             {
                 name: "TestBlog",
                 slug: "tst",
-                posts: [
-                    {
-                        foo: "bar"
-                    }
-                ]
+                posts: []
             }
         );
 
@@ -62,7 +59,6 @@ describe("Blog test", () => {
         expect(dbData.length).to.eq(3);
 
         expect(response.data).to.deep.eq({
-            id: dbData[2]._id.toString(),
             name: "TestBlog",
             slug: "tst",
             posts: []
@@ -78,13 +74,11 @@ describe("Blog test", () => {
 
         expect(response.data).to.deep.eq([
             {
-                id: dbIds[0].toString(),
                 name: "Initial Blog",
                 slug: "init",
                 posts: []
             },
             {
-                id: dbIds[1].toString(),
                 name: "Second Blog Ever",
                 slug: "2nd",
                 posts: []
@@ -98,7 +92,6 @@ describe("Blog test", () => {
 
         expect(response.data).to.deep.eq(
             {
-                id: dbIds[1].toString(),
                 name: "Second Blog Ever",
                 slug: "2nd",
                 posts: []
@@ -129,7 +122,6 @@ describe("Blog test", () => {
         );
 
         expect(response.data).to.deep.eq({
-            id: dbIds[0].toString(),
             name: "Original Blog",
             slug: "orig",
             posts: []
@@ -142,7 +134,6 @@ describe("Blog test", () => {
         expect(dbCount).to.eq(1);
 
         expect(response.data).to.deep.eq({
-            id: dbIds[0].toString(),
             name: "Original Blog",
             slug: "orig",
             posts: []

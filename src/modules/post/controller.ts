@@ -22,11 +22,25 @@ export class PostController {
         blogId: BlogId,
         posts: Post[]
     ): Promise<PostAppInternal[]> {
-        throw new Error("Not implemented yet!");
+        if (posts.length < 1) {
+            return [];
+        }
+        return await this.postCollection.createMany(
+            posts.map(post => ({
+                ...post,
+                blogId
+            }))
+        );
     }
 
     async getPostsByBlogId(
         blogId: BlogId
+    ): Promise<PostAppInternal[]> {
+        return await this.postCollection.read({ blogId });
+    }
+
+    async getPostsByBlogIds(
+        blogIds: BlogId[]
     ): Promise<PostAppInternal[]> {
         throw new Error("Not implemented yet!");
     }

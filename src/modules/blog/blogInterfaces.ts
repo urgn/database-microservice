@@ -1,4 +1,4 @@
-import { Post } from "../post/postIntefaces";
+import { PostWithId } from "../post/postIntefaces";
 
 export interface Blog {
     name: string;
@@ -16,6 +16,6 @@ export interface ReadBlogFilter {
     slug: string;
 }
 
-export type BlogResponse = BlogWithId & {
-    posts: Post[];
+export type BlogResponse = Blog & {
+    posts: PostWithId[];
 }

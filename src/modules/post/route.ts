@@ -5,8 +5,7 @@ import { BlogController } from "../blog/controller";
 import { PostController } from "./controller";
 import { NotFound, BadRequest } from "http-errors";
 import { BlogWithId } from "../blog/blogInterfaces";
-import { PostAppInternal, PostResponse } from "./postIntefaces";
-import { pick } from "ramda";
+import { PostMapper } from "./postMapper";
 
 
 @injectable()
@@ -41,7 +40,7 @@ export class PostRouter implements AppRouter {
 
             const post = await this.postController.createPost(blog.id, postInput);
 
-            res.send(this.mapPostAppInternalToPostResponse(post));
+            res.send(PostMapper.mapPostAppInternalToPostResponse(post));
         } catch (error) {
             next(error);
         }
@@ -50,7 +49,7 @@ export class PostRouter implements AppRouter {
     async handleGetOne(req: Request, res: Response, next: NextFunction) {
         try {
             const post = await this.fetchPostRelatedToBlog(req);
-            return res.send(this.mapPostAppInternalToPostResponse(post));
+            return res.send(PostMapper.mapPostAppInternalToPostResponse(post));
         } catch (error) {
             return next(error);
         }
@@ -62,7 +61,7 @@ export class PostRouter implements AppRouter {
             const { ...postInput } = req.body;
             const updatedBlog = await this.postController.updatePost(targetPost.id, postInput);
 
-            return res.status(200).send(this.mapPostAppInternalToPostResponse(updatedBlog));
+            return res.status(200).send(PostMapper.mapPostAppInternalToPostResponse(updatedBlog));
         } catch (error) {
             console.error(error);
             return next(error);
@@ -73,7 +72,7 @@ export class PostRouter implements AppRouter {
         try {
             const post = await this.fetchPostRelatedToBlog(req);
             await this.postController.deletePost(post.id);
-            return res.send(this.mapPostAppInternalToPostResponse(post));
+            return res.send(PostMapper.mapPostAppInternalToPostResponse(post));
         } catch (error) {
             return next(error);
         }
@@ -110,11 +109,5 @@ export class PostRouter implements AppRouter {
         }
 
         return post;
-    }
-
-    private mapPostAppInternalToPostResponse(
-        post: PostAppInternal
-    ): PostResponse {
-        return pick(["id", "title", "viewCount", "content"], post);
     }
 }
