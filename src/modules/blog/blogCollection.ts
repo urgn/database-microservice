@@ -2,7 +2,6 @@ import { injectable } from "inversify";
 import { Collection, Filter, ObjectId, WithId } from "mongodb";
 import { Blog, BlogFilter, BlogId, BlogWithId } from "./blogInterfaces";
 import { Mongodb } from "../../shared/mongodb";
-import { BlogErrors } from "./errors";
 
 @injectable()
 export class BlogCollection {

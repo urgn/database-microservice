@@ -2,6 +2,7 @@ import { injectable, multiInject, inject } from "inversify";
 import express, { Express, Router } from "express";
 import { Server } from "http";
 import * as bodyParser from "body-parser";
+import { expressErrorHandler } from "./expressErrorHandler";
 
 export interface AppRouter {
     path: string;
@@ -22,13 +23,7 @@ export class HttpServer {
         this.routes.forEach(router => {
             this.expressApp.use(router.path, router.expressRouter);
         });
-        this.expressApp.use((err, req, res, next) => {
-            if (res.headersSent) {
-                return next(err)
-            }
-            res.status(500)
-            res.render('error', { error: err })
-        });
+        this.expressApp.use(expressErrorHandler());
     }
 
     async start() {

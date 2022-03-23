@@ -6,7 +6,6 @@ import {
     BlogId,
     BlogFilter
 } from "./blogInterfaces";
-import { BlogErrors } from "./errors";
 
 @injectable()
 export class BlogController {
@@ -29,17 +28,17 @@ export class BlogController {
         const blogs = await this.blogCollection.read({ slug });
 
         if (blogs.length !== 1) {
-            throw new Error(BlogErrors.NOT_FOUND);
+            return null;
         }
 
         return blogs[0];
     }
 
-    async updateBlog(blogId: BlogId, data: Blog): Promise<BlogWithId>  {
+    async updateBlog(blogId: BlogId, data: Blog): Promise<BlogWithId> {
         return await this.blogCollection.update(blogId, data);
     }
 
-    async deleteBlog(blogId: BlogId): Promise<void>  {
+    async deleteBlog(blogId: BlogId): Promise<void> {
         await this.blogCollection.delete(blogId);
     }
 }
