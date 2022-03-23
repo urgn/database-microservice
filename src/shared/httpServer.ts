@@ -11,46 +11,46 @@ export interface AppRouter {
 
 @injectable()
 export class HttpServer {
-    private expressApp: Express;
-    private server?: Server;
+	private expressApp: Express;
+	private server?: Server;
 
-    constructor(
+	constructor(
         @inject("Settings.HTTP_PORT") private httpPort: string,
         @multiInject("ROUTER") private routes: AppRouter[]
-    ) {
-        this.expressApp = express();
-        this.expressApp.use(bodyParser.json());
-        this.routes.forEach(router => {
-            this.expressApp.use(router.path, router.expressRouter);
-        });
-        this.expressApp.use(expressErrorHandler());
-    }
+	) {
+		this.expressApp = express();
+		this.expressApp.use(bodyParser.json());
+		this.routes.forEach(router => {
+			this.expressApp.use(router.path, router.expressRouter);
+		});
+		this.expressApp.use(expressErrorHandler());
+	}
 
-    async start() {
-        this.server = await new Promise(res => {
-            const server = this.expressApp.listen(this.httpPort, () => {
-                res(server);
-            })
-        });
-    }
+	async start() {
+		this.server = await new Promise(res => {
+			const server = this.expressApp.listen(this.httpPort, () => {
+				res(server);
+			});
+		});
+	}
 
-    async stop() {
-        new Promise((res, rej) => {
-            if (!this.server) {
-                rej(new Error("Server not started"));
-                return;
-            }
+	async stop() {
+		new Promise((res, rej) => {
+			if (!this.server) {
+				rej(new Error("Server not started"));
+				return;
+			}
 
-            this.server.close((err) => {
-                if (err) {
-                    rej(err);
-                }
-                res(null);
-            });
-        });
-    }
+			this.server.close((err) => {
+				if (err) {
+					rej(err);
+				}
+				res(null);
+			});
+		});
+	}
 
-    get app() {
-        return this.expressApp;
-    }
+	get app() {
+		return this.expressApp;
+	}
 }

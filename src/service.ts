@@ -5,19 +5,19 @@ import { Mongodb } from "./shared/mongodb";
 @injectable()
 export class Service {
 
-    constructor(
+	constructor(
         private httpServer: HttpServer,
         private mongodb: Mongodb
-    ) { }
+	) { }
 
-    async start() {
-        await this.mongodb.connect();
-        return await this.httpServer.start()
-    }
+	async start() {
+		await this.mongodb.connect();
+		return await this.httpServer.start();
+	}
 
-    async stop() {
-        await this.httpServer.stop();
-        await this.mongodb.stop();
-    }
+	async stop() {
+		await this.httpServer.stop();
+		await this.mongodb.stop();
+	}
 
 }

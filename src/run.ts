@@ -4,8 +4,8 @@ import { Service } from "./service";
 const service = container.get(Service);
 
 service.start().then(() => {
-    console.log("Application has started")
+	console.log("Application has started");
 }).catch(error => {
-    console.error(error);
-    process.exit(1);
+	console.error(error);
+	process.exit(1);
 });

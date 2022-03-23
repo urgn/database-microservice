@@ -7,148 +7,144 @@ import { Mongodb } from "../src/shared/mongodb";
 
 describe("Blog test", () => {
 
-    let service: Service;
-    let mongodb: Mongodb;
+	let service: Service;
+	let mongodb: Mongodb;
 
-    before(async () => {
+	before(async () => {
 
-        service = container.get(Service);
-        mongodb = container.get(Mongodb);
+		service = container.get(Service);
+		mongodb = container.get(Mongodb);
 
-        await service.start();
-    });
+		await service.start();
+	});
 
-    after(async () => {
-        await service.stop();
-    });
+	after(async () => {
+		await service.stop();
+	});
 
-    let dbIds = {};
+	beforeEach(async () => {
+		await mongodb.getCollection("blog").insertMany([
+			{
+				name: "Initial Blog",
+				slug: "init",
+			},
+			{
+				name: "Second Blog Ever",
+				slug: "2nd"
+			}
+		]);
+	});
 
-    beforeEach(async () => {
-        const { insertedIds } = await mongodb.getCollection("blog").insertMany([
-            {
-                name: "Initial Blog",
-                slug: "init",
-            },
-            {
-                name: "Second Blog Ever",
-                slug: "2nd"
-            }
-        ]);
+	afterEach(async () => {
+		await mongodb.getCollection("blog").deleteMany({});
+		await mongodb.getCollection("post").deleteMany({});
+	});
 
-        dbIds = insertedIds;
-    });
+	it("should create blog", async () => {
+		const response = await axios.post(
+			`http://localhost:${settings.HTTP_PORT}/blog`,
+			{
+				name: "TestBlog",
+				slug: "tst",
+				posts: []
+			}
+		);
 
-    afterEach(async () => {
-        await mongodb.getCollection("blog").deleteMany({});
-        await mongodb.getCollection("post").deleteMany({});
-    });
+		const dbData = await mongodb.getCollection("blog").find({}).toArray();
 
-    it("should create blog", async () => {
-        const response = await axios.post(
-            `http://localhost:${settings.HTTP_PORT}/blog`,
-            {
-                name: "TestBlog",
-                slug: "tst",
-                posts: []
-            }
-        );
+		expect(dbData.length).to.eq(3);
 
-        const dbData = await mongodb.getCollection("blog").find({}).toArray();
+		expect(response.data).to.deep.eq({
+			name: "TestBlog",
+			slug: "tst",
+			posts: []
+		});
+	});
 
-        expect(dbData.length).to.eq(3);
+	it("should read blogs", async () => {
+		const response = await axios.get(`http://localhost:${settings.HTTP_PORT}/blog`);
 
-        expect(response.data).to.deep.eq({
-            name: "TestBlog",
-            slug: "tst",
-            posts: []
-        });
-    });
+		const dbData = await mongodb.getCollection("blog").find({}).toArray();
 
-    it("should read blogs", async () => {
-        const response = await axios.get(`http://localhost:${settings.HTTP_PORT}/blog`);
+		expect(dbData.length).to.eq(2);
 
-        const dbData = await mongodb.getCollection("blog").find({}).toArray();
+		expect(response.data).to.deep.eq([
+			{
+				name: "Initial Blog",
+				slug: "init",
+				posts: []
+			},
+			{
+				name: "Second Blog Ever",
+				slug: "2nd",
+				posts: []
+			}
+		]);
+	});
 
-        expect(dbData.length).to.eq(2);
+	it("should read blog by slug", async () => {
+		const testSlug = "2nd";
+		const response = await axios.get(`http://localhost:${settings.HTTP_PORT}/blog/${testSlug}`);
 
-        expect(response.data).to.deep.eq([
-            {
-                name: "Initial Blog",
-                slug: "init",
-                posts: []
-            },
-            {
-                name: "Second Blog Ever",
-                slug: "2nd",
-                posts: []
-            }
-        ]);
-    });
+		expect(response.data).to.deep.eq(
+			{
+				name: "Second Blog Ever",
+				slug: "2nd",
+				posts: []
+			}
+		);
+	});
 
-    it("should read blog by slug", async () => {
-        const testSlug = "2nd";
-        const response = await axios.get(`http://localhost:${settings.HTTP_PORT}/blog/${testSlug}`);
+	it("should get error while missing blog", async () => {
+		const testSlug = "na";
 
-        expect(response.data).to.deep.eq(
-            {
-                name: "Second Blog Ever",
-                slug: "2nd",
-                posts: []
-            }
-        );
-    });
+		try {
+			await axios.get(`http://localhost:${settings.HTTP_PORT}/blog/${testSlug}`);
+			expect.fail();
+		} catch (e) {
+			expect(e.toString()).to.match(/404/);
+		}
+	});
 
-    it("should get error while missing blog", async () => {
-        const testSlug = "na";
+	it("should update blog", async () => {
+		const testSlug = "init";
 
-        try {
-            await axios.get(`http://localhost:${settings.HTTP_PORT}/blog/${testSlug}`);
-            expect.fail();
-        } catch (e) {
-            expect(e.toString()).to.match(/404/);
-        }
-    });
+		const response = await axios.put(
+			`http://localhost:${settings.HTTP_PORT}/blog/${testSlug}`,
+			{
+				name: "Original Blog",
+				slug: "orig"
+			}
+		);
 
-    it("should update blog", async () => {
-        const testSlug = "init";
+		expect(response.data).to.deep.eq({
+			name: "Original Blog",
+			slug: "orig",
+			posts: []
+		});
 
-        const response = await axios.put(
-            `http://localhost:${settings.HTTP_PORT}/blog/${testSlug}`,
-            {
-                name: "Original Blog",
-                slug: "orig"
-            }
-        );
+		const dbCount = await mongodb.getCollection("blog").count({
+			slug: "orig"
+		});
 
-        expect(response.data).to.deep.eq({
-            name: "Original Blog",
-            slug: "orig",
-            posts: []
-        });
+		expect(dbCount).to.eq(1);
 
-        const dbCount = await mongodb.getCollection("blog").count({
-            slug: "orig"
-        });
+		expect(response.data).to.deep.eq({
+			name: "Original Blog",
+			slug: "orig",
+			posts: []
+		});
 
-        expect(dbCount).to.eq(1);
+	});
 
-        expect(response.data).to.deep.eq({
-            name: "Original Blog",
-            slug: "orig",
-            posts: []
-        });
+	it("should delete blog", async () => {
+		const testSlug = "init";
 
-    });
+		await axios.delete(
+			`http://localhost:${settings.HTTP_PORT}/blog/${testSlug}`,
+		);
 
-    it("should delete blog", async () => {
-        const testSlug = "init";
-
-        await axios.delete(
-            `http://localhost:${settings.HTTP_PORT}/blog/${testSlug}`,
-        );
-
-        const dbData = await mongodb.getCollection("blog").find({}).toArray();
-        expect(dbData.length).to.eq(1);
-    });
-})
+		const dbData = await mongodb.getCollection("blog").find({}).toArray();
+		expect(dbData.length).to.eq(1);
+	});
+});

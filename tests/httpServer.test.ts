@@ -6,22 +6,22 @@ import { Service } from "../src/service";
 
 describe("HttpServer test", () => {
 
-    let service: Service;
+	let service: Service;
 
-    before(async () => {
-        service = container.get(Service);
-        await service.start();
-    });
+	before(async () => {
+		service = container.get(Service);
+		await service.start();
+	});
 
-    after(async () => {
-        await service.stop();
-    });
+	after(async () => {
+		await service.stop();
+	});
 
-    it("shoul make health check", async () => {
-        const response = await axios.get(`http://localhost:${settings.HTTP_PORT}/health`);
+	it("shoul make health check", async () => {
+		const response = await axios.get(`http://localhost:${settings.HTTP_PORT}/health`);
 
-        expect(response.data).to.deep.eq({
-            status: "ok"
-        });
-    });
-})
+		expect(response.data).to.deep.eq({
+			status: "ok"
+		});
+	});
+});

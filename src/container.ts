@@ -16,7 +16,7 @@ import { attachBlogModule } from "./modules/blog/module";
 export const container = new Container();
 
 for (const settingKey in settings) {
-    container.bind(`Settings.${settingKey}`).toConstantValue(settings[settingKey]);
+	container.bind(`Settings.${settingKey}`).toConstantValue(settings[settingKey]);
 }
 
 container.bind("ROUTER").to(HealthRouter);

@@ -5,7 +5,8 @@
   "scripts": {
     "build": "rimraf dist && tsc",
     "start": "npm run build && node dist/src/run.js",
-    "test": "mocha --require=ts-node/register --exit ./tests/**/*.test.ts"
+    "test": "mocha --require=ts-node/register --exit ./tests/**/*.test.ts",
+    "lint": "npx eslint . --fix "
   },
   "repository": {
     "type": "git",
@@ -27,8 +28,11 @@
     "@types/mocha": "^9.1.0",
     "@types/mongodb": "^4.0.7",
     "@types/ramda": "^0.28.1",
+    "@typescript-eslint/eslint-plugin": "^5.16.0",
+    "@typescript-eslint/parser": "^5.16.0",
     "axios": "^0.26.1",
     "chai": "^4.3.6",
+    "eslint": "^8.11.0",
     "mocha": "^9.2.2",
     "rimraf": "^3.0.2",
     "ts-node": "^10.7.0",

@@ -5,7 +5,7 @@ import { BlogRouter } from "./route";
 import { BlogCollection } from "./blogCollection";
 
 export const attachBlogModule = (container: Container) => {
-    container.bind(BlogController).toSelf();
-    container.bind(BlogCollection).toSelf();
-    container.bind("ROUTER").to(BlogRouter);
+	container.bind(BlogController).toSelf();
+	container.bind(BlogCollection).toSelf();
+	container.bind("ROUTER").to(BlogRouter);
 };
