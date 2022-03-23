@@ -48,21 +48,8 @@ export class PostRouter implements AppRouter {
 
     async handleGetOne(req: Request, res: Response, next: NextFunction) {
         try {
-            const blog = await this.fetchBlogBySlug(req);
-            const { postId } = req.params;
-    
-            if (!postId) {
-                return next(new BadRequest("Missing post id"));
-            }
-
-            const post = await this.postController.getOnePost(postId);
-
-            if (!post || post.blogId !== blog.id) {
-                return next(new NotFound(`Post with id ${postId} not found`));
-            }
-
+            const post = await this.fetchPostRelatedToBlog(req);
             return res.send(this.mapPostAppInternalToPostResponse(post));
-
         } catch (error) {
             return next(error);
         }
@@ -76,12 +63,14 @@ export class PostRouter implements AppRouter {
         });
     }
 
-    async handleDelete(req: Request, res: Response) {
-        res.send({
-            result: "post deleted",
-            blog: req.params.slug,
-            post: req.params.postId
-        });
+    async handleDelete(req: Request, res: Response, next: NextFunction) {
+        try {
+            const post = await this.fetchPostRelatedToBlog(req);
+            await this.postController.deletePost(post.id);
+            return res.send(this.mapPostAppInternalToPostResponse(post));
+        } catch (error) {
+            return next(error);
+        }
     }
 
     private async fetchBlogBySlug(req: Request): Promise<BlogWithId> {
@@ -98,6 +87,23 @@ export class PostRouter implements AppRouter {
         }
 
         return relatedBlog
+    }
+
+    private async fetchPostRelatedToBlog(req) {
+        const blog = await this.fetchBlogBySlug(req);
+        const { postId } = req.params;
+
+        if (!postId) {
+            throw new BadRequest("Missing post id");
+        }
+
+        const post = await this.postController.getOnePost(postId);
+
+        if (!post || post.blogId !== blog.id) {
+            throw new NotFound(`Post with id ${postId} not found`);
+        }
+
+        return post;
     }
 
     private mapPostAppInternalToPostResponse(

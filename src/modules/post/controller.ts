@@ -56,6 +56,6 @@ export class PostController {
     async deletePost(
         postId: PostId
     ): Promise<void> {
-        throw new Error("Not implemented yet!");
+        await this.postCollection.delete(postId);
     }
 }

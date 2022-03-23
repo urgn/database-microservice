@@ -139,14 +139,12 @@ describe("Post test", () => {
     });
 
     it("should delete post", async () => {
-        const response = await axios.delete(
+        await axios.delete(
             `http://localhost:${settings.HTTP_PORT}/blog/${blogSlug}/${mockPostIds[0].toString()}`
         );
 
-        expect(response.data).to.deep.eq({
-            blog: blogSlug,
-            post: mockPostIds[0].toString(),
-            result: "post deleted"
-        });
+        const dbCount = await mongodb.getCollection("post").count({ _id: mockPostIds[0] });
+
+        expect(dbCount).to.eq(0);
     });
 })

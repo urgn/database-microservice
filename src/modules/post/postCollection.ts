@@ -2,7 +2,7 @@ import { injectable } from "inversify";
 import { Filter, ObjectId, WithId } from "mongodb";
 import { omit, pick } from "ramda";
 import { Mongodb } from "../../shared/mongodb";
-import { PostAppInternal, PostFilter, PostRelatedToBlog } from "./postIntefaces";
+import { PostAppInternal, PostFilter, PostId, PostRelatedToBlog } from "./postIntefaces";
 
 @injectable()
 export class PostCollection {
@@ -39,6 +39,26 @@ export class PostCollection {
         }
 
         return mongoFilter;
+    }
+
+    public async update(postId: PostId, contents: PostRelatedToBlog): Promise<PostAppInternal> {
+        const mongdoId = new ObjectId(postId);
+        await this.collection().updateOne(
+            {
+                _id: mongdoId
+            }, {
+            $set: contents
+        });
+
+        const updatedBlog = await this.collection().findOne({ _id: mongdoId });
+
+        return this.mapMongoPostToApp(updatedBlog);
+    }
+
+    public async delete(postId: PostId): Promise<void> {
+        this.collection().deleteOne({
+            _id: new ObjectId(postId)
+        });
     }
 
     private mapMongoPostToApp(
