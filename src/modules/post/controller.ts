@@ -27,9 +27,8 @@ export class PostController {
 
     async getPostsByBlogId(
         blogId: BlogId
-    ): Promise<PostAppInternal> {
+    ): Promise<PostAppInternal[]> {
         throw new Error("Not implemented yet!");
-
     }
 
     async getOnePost(
@@ -50,7 +49,7 @@ export class PostController {
         postId: PostId,
         postBody: Post
     ): Promise<PostAppInternal> {
-        throw new Error("Not implemented yet!");
+        return await this.postCollection.update(postId, postBody);
     }
 
     async deletePost(

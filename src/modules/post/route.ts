@@ -6,6 +6,7 @@ import { PostController } from "./controller";
 import { NotFound, BadRequest } from "http-errors";
 import { BlogWithId } from "../blog/blogInterfaces";
 import { PostAppInternal, PostResponse } from "./postIntefaces";
+import { pick } from "ramda";
 
 
 @injectable()
@@ -55,12 +56,17 @@ export class PostRouter implements AppRouter {
         }
     }
 
-    async handleUpdate(req: Request, res: Response) {
-        res.send({
-            result: "post updated",
-            blog: req.params.slug,
-            post: req.params.postId
-        });
+    async handleUpdate(req: Request, res: Response, next: NextFunction) {
+        try {
+            const targetPost = await this.fetchPostRelatedToBlog(req);
+            const { ...postInput } = req.body;
+            const updatedBlog = await this.postController.updatePost(targetPost.id, postInput);
+
+            return res.status(200).send(this.mapPostAppInternalToPostResponse(updatedBlog));
+        } catch (error) {
+            console.error(error);
+            return next(error);
+        }
     }
 
     async handleDelete(req: Request, res: Response, next: NextFunction) {
@@ -107,10 +113,8 @@ export class PostRouter implements AppRouter {
     }
 
     private mapPostAppInternalToPostResponse(
-        { id, title, viewCount, content }: PostAppInternal
+        post: PostAppInternal
     ): PostResponse {
-        return ({
-            id, title, viewCount, content
-        })
+        return pick(["id", "title", "viewCount", "content"], post);
     }
 }

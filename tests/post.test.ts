@@ -126,14 +126,29 @@ describe("Post test", () => {
         const response = await axios.put(
             `http://localhost:${settings.HTTP_PORT}/blog/${blogSlug}/${mockPostIds[0].toString()}`,
             {
-                foo: "bar"
+                title: "Updated Post",
+                content: "Updated content",
+                viewCount: 9000
             }
         );
 
         expect(response.data).to.deep.eq({
-            blog: blogSlug,
-            post: mockPostIds[0].toString(),
-            result: "post updated"
+            id: mockPostIds[0].toString(),
+            title: "Updated Post",
+            content: "Updated content",
+            viewCount: 9000
+        });
+
+        const dbData = await mongodb.getCollection("post").findOne({
+            _id: mockPostIds[0]
+        });
+
+        expect(dbData).to.deep.eq({
+            _id: mockPostIds[0],
+            title: "Updated Post",
+            content: "Updated content",
+            viewCount: 9000,
+            blogId: mockBlogIds[0].toString()
         });
 
     });

@@ -41,7 +41,7 @@ export class PostCollection {
         return mongoFilter;
     }
 
-    public async update(postId: PostId, contents: PostRelatedToBlog): Promise<PostAppInternal> {
+    public async update(postId: PostId, contents: Partial<PostRelatedToBlog>): Promise<PostAppInternal> {
         const mongdoId = new ObjectId(postId);
         await this.collection().updateOne(
             {
