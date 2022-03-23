@@ -5,7 +5,7 @@ import { BlogController } from "../blog/controller";
 import { PostController } from "./controller";
 import { NotFound, BadRequest } from "http-errors";
 import { BlogWithId } from "../blog/blogInterfaces";
-import { PostAppInternal, PostResponse, PostWithId } from "./postIntefaces";
+import { PostAppInternal, PostResponse } from "./postIntefaces";
 
 
 @injectable()
@@ -35,7 +35,7 @@ export class PostRouter implements AppRouter {
 
     async handlePost(req: Request, res: Response, next: NextFunction) {
         try {
-            const blog = await this.fetchBlogBySlugMiddleware(req);
+            const blog = await this.fetchBlogBySlug(req);
             const { ...postInput } = req.body;
 
             const post = await this.postController.createPost(blog.id, postInput);
@@ -46,12 +46,26 @@ export class PostRouter implements AppRouter {
         }
     }
 
-    async handleGetOne(req: Request, res: Response) {
-        res.send({
-            result: "post returned",
-            blog: req.params.slug,
-            post: req.params.postId
-        });
+    async handleGetOne(req: Request, res: Response, next: NextFunction) {
+        try {
+            const blog = await this.fetchBlogBySlug(req);
+            const { postId } = req.params;
+    
+            if (!postId) {
+                return next(new BadRequest("Missing post id"));
+            }
+
+            const post = await this.postController.getOnePost(postId);
+
+            if (!post || post.blogId !== blog.id) {
+                return next(new NotFound(`Post with id ${postId} not found`));
+            }
+
+            return res.send(this.mapPostAppInternalToPostResponse(post));
+
+        } catch (error) {
+            return next(error);
+        }
     }
 
     async handleUpdate(req: Request, res: Response) {
@@ -70,7 +84,7 @@ export class PostRouter implements AppRouter {
         });
     }
 
-    private async fetchBlogBySlugMiddleware(req: Request): Promise<BlogWithId> {
+    private async fetchBlogBySlug(req: Request): Promise<BlogWithId> {
         const { slug } = req.params;
 
         if (!slug) {
@@ -86,7 +100,9 @@ export class PostRouter implements AppRouter {
         return relatedBlog
     }
 
-    private mapPostAppInternalToPostResponse({id, title, viewCount, content}: PostAppInternal): PostResponse {
+    private mapPostAppInternalToPostResponse(
+        { id, title, viewCount, content }: PostAppInternal
+    ): PostResponse {
         return ({
             id, title, viewCount, content
         })

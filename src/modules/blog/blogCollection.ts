@@ -47,7 +47,7 @@ export class BlogCollection {
     public async delete(blogId: BlogId): Promise<void> {
         this.collection().deleteOne({
             _id: new ObjectId(blogId)
-        })
+        });
     }
 
     private mapFilterToMongoFilter(filter: BlogFilter): Filter<Blog> {

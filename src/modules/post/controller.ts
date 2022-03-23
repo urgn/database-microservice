@@ -25,7 +25,7 @@ export class PostController {
         throw new Error("Not implemented yet!");
     }
 
-    async getPosts(
+    async getPostsByBlogId(
         blogId: BlogId
     ): Promise<PostAppInternal> {
         throw new Error("Not implemented yet!");
@@ -35,7 +35,15 @@ export class PostController {
     async getOnePost(
         postId: PostId
     ): Promise<PostAppInternal> {
-        throw new Error("Not implemented yet!");
+        const posts = await this.postCollection.read({
+            id: postId
+        });
+
+        if (posts.length !== 1) {
+            return null;
+        }
+
+        return posts[0];
     }
 
     async updatePost(

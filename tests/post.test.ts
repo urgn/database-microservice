@@ -24,19 +24,51 @@ describe("Post test", () => {
     });
 
     const blogSlug = "dummy";
-    let postId = "unknown";
-    let mockBlogId: ObjectId;
+    let mockPostIds: { [key: number]: ObjectId; };
+    let mockBlogIds: { [key: number]: ObjectId; };
 
     beforeEach(async () => {
-        const { insertedId } = await mongodb.getCollection("blog")
-            .insertOne(
-                {
-                    name: "Testing Blog",
-                    slug: blogSlug,
-                }
+        const { insertedIds: blogIds } = await mongodb.getCollection("blog")
+            .insertMany(
+                [
+                    {
+                        name: "Testing Blog",
+                        slug: blogSlug,
+                    },
+                    {
+                        name: "Second Blog",
+                        slug: "2nd"
+                    }
+                ]
             );
 
-        mockBlogId = insertedId;
+        mockBlogIds = blogIds;
+
+        const { insertedIds: postIds } = await mongodb.getCollection("post")
+            .insertMany(
+                [
+                    {
+                        blogId: mockBlogIds[0].toString(),
+                        title: "Welcome post",
+                        content: "Lorem ipsum",
+                        viewCount: 123
+                    },
+                    {
+                        blogId: mockBlogIds[0].toString(),
+                        title: "Another Post",
+                        content: "Foo Bar",
+                        viewCount: 456
+                    },
+                    {
+                        blogId: mockBlogIds[1].toString(),
+                        title: "Post of different blog",
+                        content: "Just in case",
+                        viewCount: -1
+                    }
+                ]
+            );
+
+        mockPostIds = postIds;
     });
 
     afterEach(async () => {
@@ -56,10 +88,10 @@ describe("Post test", () => {
 
         const dbData = await mongodb.getCollection("post").find({}).toArray();
 
-        expect(dbData.length).to.eq(1);
+        expect(dbData.length).to.eq(4);
 
         expect(response.data).to.deep.eq({
-            id: dbData[0]._id.toString(),
+            id: dbData[3]._id.toString(),
             title: "New post for testing",
             content: "Hello world!",
             viewCount: 0
@@ -68,19 +100,31 @@ describe("Post test", () => {
 
     it("should read post by id", async () => {
         const response = await axios.get(
-            `http://localhost:${settings.HTTP_PORT}/blog/${blogSlug}/${postId}`
+            `http://localhost:${settings.HTTP_PORT}/blog/${blogSlug}/${mockPostIds[1]}`
         );
 
         expect(response.data).to.deep.eq({
-            blog: blogSlug,
-            post: postId,
-            result: "post returned"
+            id: mockPostIds[1].toString(),
+            title: "Another Post",
+            content: "Foo Bar",
+            viewCount: 456
         });
+    });
+
+    it("should fail reading post from abother slug", async () => {
+        try {
+            await axios.get(
+                `http://localhost:${settings.HTTP_PORT}/blog/${blogSlug}/${mockPostIds[2].toString()}`
+            );
+            expect.fail();
+        } catch (error) {
+            expect(error).to.match(/404/)
+        }
     });
 
     it("should update post", async () => {
         const response = await axios.put(
-            `http://localhost:${settings.HTTP_PORT}/blog/${blogSlug}/${postId}`,
+            `http://localhost:${settings.HTTP_PORT}/blog/${blogSlug}/${mockPostIds[0].toString()}`,
             {
                 foo: "bar"
             }
@@ -88,7 +132,7 @@ describe("Post test", () => {
 
         expect(response.data).to.deep.eq({
             blog: blogSlug,
-            post: postId,
+            post: mockPostIds[0].toString(),
             result: "post updated"
         });
 
@@ -96,12 +140,12 @@ describe("Post test", () => {
 
     it("should delete post", async () => {
         const response = await axios.delete(
-            `http://localhost:${settings.HTTP_PORT}/blog/${blogSlug}/${postId}`
+            `http://localhost:${settings.HTTP_PORT}/blog/${blogSlug}/${mockPostIds[0].toString()}`
         );
 
         expect(response.data).to.deep.eq({
             blog: blogSlug,
-            post: postId,
+            post: mockPostIds[0].toString(),
             result: "post deleted"
         });
     });
