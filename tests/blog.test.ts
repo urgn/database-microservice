@@ -61,6 +61,23 @@ describe("Blog test", () => {
 		});
 	});
 
+
+	it("should fail creation with the same slug", async () => {
+		try {
+			await axios.post(
+				`http://localhost:${settings.HTTP_PORT}/blog`,
+				{
+					name: "Another 2nd blog",
+					slug: "2nd",
+					posts: []
+				}
+			);
+			expect.fail();
+		} catch (e) {
+			expect(e.toString()).to.match(/400/);
+		}
+	});
+
 	it("should read blogs", async () => {
 		const response = await axios.get(`http://localhost:${settings.HTTP_PORT}/blog`);
 

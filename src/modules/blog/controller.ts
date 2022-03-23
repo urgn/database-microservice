@@ -11,8 +11,12 @@ import {
 export class BlogController {
 
 	constructor(
-        private blogCollection: BlogCollection
+		private blogCollection: BlogCollection
 	) {
+	}
+
+	async init() {
+		await this.blogCollection.init();
 	}
 
 	async createBlog(spec: Blog): Promise<BlogWithId> {

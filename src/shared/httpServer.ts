@@ -5,8 +5,9 @@ import * as bodyParser from "body-parser";
 import { expressErrorHandler } from "./expressErrorHandler";
 
 export interface AppRouter {
-    path: string;
-    expressRouter: Router;
+	path: string;
+	expressRouter: Router;
+	init?: () => Promise<void>
 }
 
 @injectable()
@@ -15,8 +16,8 @@ export class HttpServer {
 	private server?: Server;
 
 	constructor(
-        @inject("Settings.HTTP_PORT") private httpPort: string,
-        @multiInject("ROUTER") private routes: AppRouter[]
+		@inject("Settings.HTTP_PORT") private httpPort: string,
+		@multiInject("ROUTER") private routes: AppRouter[]
 	) {
 		this.expressApp = express();
 		this.expressApp.use(bodyParser.json());
@@ -27,6 +28,10 @@ export class HttpServer {
 	}
 
 	async start() {
+		for (const router of this.routes) {
+			router.init && await router.init();
+		}
+
 		this.server = await new Promise(res => {
 			const server = this.expressApp.listen(this.httpPort, () => {
 				res(server);

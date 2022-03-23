@@ -6,7 +6,7 @@
     "build": "rimraf dist && tsc",
     "start": "npm run build && node dist/src/run.js",
     "test": "mocha --require=ts-node/register --exit ./tests/**/*.test.ts",
-    "lint": "npx eslint . --fix "
+    "lint": "npx eslint src/. --fix "
   },
   "repository": {
     "type": "git",

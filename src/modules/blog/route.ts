@@ -4,10 +4,11 @@ import { AppRouter } from "../../shared/httpServer";
 import { PostAppInternal } from "../post/postIntefaces";
 import { BlogResponse, BlogWithId } from "./blogInterfaces";
 import { BlogController } from "./controller";
-import { NotFound } from "http-errors";
+import { NotFound, BadRequest } from "http-errors";
 import { PostController } from "../post/controller";
 import { isNil, pick } from "ramda";
 import { PostMapper } from "../post/postMapper";
+import { BlogErrors } from "./blogErrors";
 
 @injectable()
 export class BlogRouter implements AppRouter {
@@ -35,6 +36,10 @@ export class BlogRouter implements AppRouter {
 		return this.router;
 	}
 
+	async init() {
+		this.blogController.init();
+	}
+
 	async handlePost(req: Request, res: Response, next: NextFunction) {
 		try {
 			const { posts, ...blog } = req.body;
@@ -42,6 +47,10 @@ export class BlogRouter implements AppRouter {
 			const createdPosts = await this.postController.createPostsInBulk(createdBlog.id, posts);
 			return res.send(this.mapToBlogResponse(createdBlog, createdPosts));
 		} catch (error) {
+			if (error instanceof Error && error.message === BlogErrors.DUPLICATE_SLUG) {
+                return next(new BadRequest(error.message));
+            }
+			console.error(error);
 			console.error(error);
 			return next(error);
 		}

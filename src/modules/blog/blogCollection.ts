@@ -1,7 +1,8 @@
 import { injectable } from "inversify";
-import { Collection, Filter, ObjectId, WithId } from "mongodb";
+import { Collection, Filter, MongoServerError, ObjectId, WithId } from "mongodb";
 import { Blog, BlogFilter, BlogId, BlogWithId } from "./blogInterfaces";
 import { Mongodb } from "../../shared/mongodb";
+import { BlogErrors } from "./blogErrors";
 
 @injectable()
 export class BlogCollection {
@@ -9,17 +10,37 @@ export class BlogCollection {
         private mongodb: Mongodb
 	) { }
 
+	public init() {
+		this.collection().createIndex(
+			{
+				"slug": 1
+			},
+			{
+				unique: true
+			}
+		);
+	}
+
 	private collection(): Collection<Blog> {
 		return this.mongodb.getCollection<Blog>("blog");
 	}
 
 	public async create(spec: Blog): Promise<BlogWithId> {
-		const { insertedId } = await this.collection().insertOne(spec);
+        try {
+            const { insertedId } = await this.collection().insertOne(spec);
 
-		return {
-			id: insertedId.toString(),
-			...spec
-		};
+            return {
+                id: insertedId.toString(),
+                ...spec
+            };
+        } catch (error) {
+            if (error instanceof MongoServerError && error.code === 11000) {
+                throw new Error(BlogErrors.DUPLICATE_SLUG);
+            } else {
+                throw error;
+            }
+        }
+
 	}
 
 	public async read(filter: BlogFilter = {}): Promise<BlogWithId[]> {

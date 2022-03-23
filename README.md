@@ -9,5 +9,6 @@ npm start
 
 Run unit tests:
 ```
+docker-compose up -d
 npm t
 ```
